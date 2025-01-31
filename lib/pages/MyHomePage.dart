@@ -17,91 +17,98 @@ class _MyHomePageState extends State<MyHomePage> {
   var textController1 = TextEditingController();
   double valorGuardado1 = 0;
   double valorGuardado2 = 0;
-  double valorGuardado1Label = 0;
-  double valorGuardado2Label = 0;
+  double? valorGuardado1Label;
+  double? valorGuardado2Label;
   String calculo = "";
   String result = "";
-  List<String> conta = [];
+
+  void criarOperacao() {
+    setState(() {
+      valorGuardado2 = double.tryParse(textController1.text) ?? 0;
+      valorGuardado2Label = double.tryParse(textController1.text) ?? 0;
+
+      switch (calculo) {
+        case "+":
+          valorGuardado1 += valorGuardado2;
+          break;
+        case "-":
+          valorGuardado1 -= valorGuardado2;
+          break;
+        case "x":
+          valorGuardado1 *= valorGuardado2;
+          break;
+        case "÷":
+          valorGuardado1 /= valorGuardado2;
+          break;
+        default:
+          valorGuardado1 = valorGuardado2;
+          break;
+      }
+
+      result = "Resultado: $valorGuardado1";
+      valorGuardado1Label = valorGuardado1;
+      valorGuardado2Label = null;
+      textController1.clear();
+    });
+  }
+
 
   void somaCalc() {
     setState(() {
-      valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
-      textController1.clear();
-
+      if (calculo.isNotEmpty) {
+        criarOperacao();
+      } else {
+        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
+        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        textController1.clear();
+      }
       calculo = "+";
-      valorGuardado2Label = 0;
     });
   }
 
   void subtracaoCalc() {
     setState(() {
-      valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
-      textController1.clear();
+      if (calculo.isNotEmpty) {
+        criarOperacao();
+      } else {
+        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
+        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        textController1.clear();
+      }
       calculo = "-";
-      valorGuardado2Label = 0;
     });
   }
 
   void multiplicacaoCalc() {
     setState(() {
-      valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
-      textController1.clear();
+      if (calculo.isNotEmpty) {
+        criarOperacao();
+      } else {
+        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
+        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        textController1.clear();
+      }
       calculo = "x";
-      valorGuardado2Label = 0;
     });
   }
 
   void divisaoCalc() {
     setState(() {
-      valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
-      textController1.clear();
+      if (calculo.isNotEmpty) {
+        criarOperacao();
+      } else {
+        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
+        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        textController1.clear();
+      }
       calculo = "÷";
-      valorGuardado2Label = 0;
     });
   }
 
   void resultadoCalc() {
+    criarOperacao();
     setState(() {
-      valorGuardado2 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado2Label = double.tryParse(textController1.text) ?? 0;
-      switch (calculo) {
-        case "+":
-          double? somaResult = valorGuardado1 + valorGuardado2;
-          result = "resultado $somaResult";
-          valorGuardado1 = 0;
-          valorGuardado2 = 0;
-          textController1.clear();
-          break;
-
-        case "-":
-          double? subtracaoResult = valorGuardado1 - valorGuardado2;
-          result = "resultado $subtracaoResult";
-          valorGuardado1 = 0;
-          valorGuardado2 = 0;
-          textController1.clear();
-          break;
-
-        case "x":
-          double? multiplicacaoResult = valorGuardado1 * valorGuardado2;
-          result = "resultado $multiplicacaoResult";
-          valorGuardado1 = 0;
-          valorGuardado2 = 0;
-          textController1.clear();
-          break;
-
-        case "÷":
-          double? divisaoResult = valorGuardado1 / valorGuardado2;
-          result = "resultado $divisaoResult";
-          valorGuardado1 = 0;
-          valorGuardado2 = 0;
-          textController1.clear();
-          break;
-        default:
-      }
+      calculo = "";
     });
   }
 
@@ -109,6 +116,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       textController1.clear();
       result = "";
+      valorGuardado1 = 0;
+      valorGuardado1Label = null;
+      calculo = "";
+      valorGuardado2Label = null;
     });
   }
 
@@ -123,7 +134,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("$valorGuardado1Label $calculo $valorGuardado2Label"),
+            Text(
+              [
+                if (valorGuardado1Label != null) valorGuardado1Label.toString(),
+                if (calculo.isNotEmpty) calculo,
+                if (valorGuardado2Label != null) valorGuardado2Label.toString(),
+              ].join(' '),
+              style: const TextStyle(fontSize: 20),
+            ),
             InputWidget(controller: textController1, label: ""),
             Padding(
               padding: EdgeInsets.all(16),
