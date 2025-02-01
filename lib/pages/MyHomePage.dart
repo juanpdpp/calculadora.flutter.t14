@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:primeira_aplicacao_flutter/widgets/calcButton_widget.dart';
-import 'package:primeira_aplicacao_flutter/widgets/input_widget.dart';
 import 'package:primeira_aplicacao_flutter/widgets/eraseButton_widget.dart';
+import 'package:primeira_aplicacao_flutter/widgets/input_widget.dart';
 import 'package:primeira_aplicacao_flutter/widgets/resulButton_widget.dart';
+import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -20,12 +20,28 @@ class _MyHomePageState extends State<MyHomePage> {
   double? valorGuardado1Label;
   double? valorGuardado2Label;
   String calculo = "";
-  String result = "";
+  String historico = "";
 
   void criarOperacao() {
+    final inputText = textController1.text;
+    if (inputText.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
+
+    final parsedValue = double.tryParse(inputText);
+    if (parsedValue == null) {
+      setState(() {
+        textController1.text = "Erro: Número inválido";
+      });
+      return;
+    }
+
     setState(() {
-      valorGuardado2 = double.tryParse(textController1.text) ?? 0;
-      valorGuardado2Label = double.tryParse(textController1.text) ?? 0;
+      valorGuardado2 = parsedValue;
+      valorGuardado2Label = parsedValue;
 
       switch (calculo) {
         case "+":
@@ -38,6 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
           valorGuardado1 *= valorGuardado2;
           break;
         case "÷":
+          if (valorGuardado2 == 0) {
+            textController1.text = "Erro: Divisão por zero";
+            historico = "";
+            valorGuardado1 = 0;
+            valorGuardado1Label = null;
+            calculo = "";
+            valorGuardado2Label = null;
+            return;
+          }
           valorGuardado1 /= valorGuardado2;
           break;
         default:
@@ -45,21 +70,33 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
 
-      result = "Resultado: $valorGuardado1";
+      textController1.text = valorGuardado1.toString();
+      historico = "$valorGuardado1Label $calculo $valorGuardado2";
+
       valorGuardado1Label = valorGuardado1;
       valorGuardado2Label = null;
-      textController1.clear();
     });
   }
 
-
   void somaCalc() {
+    if (textController1.text.isEmpty && calculo.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
     setState(() {
-      if (calculo.isNotEmpty) {
+      if (calculo.isNotEmpty && valorGuardado1Label != null) {
         criarOperacao();
       } else {
-        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        final parsedValue = double.tryParse(textController1.text);
+        if (parsedValue == null) {
+          textController1.text = "Erro: Número inválido";
+          return;
+        }
+        valorGuardado1 = parsedValue;
+        valorGuardado1Label = parsedValue;
+        historico = "$valorGuardado1 +";
         textController1.clear();
       }
       calculo = "+";
@@ -67,12 +104,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void subtracaoCalc() {
+    if (textController1.text.isEmpty && calculo.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
     setState(() {
       if (calculo.isNotEmpty) {
         criarOperacao();
       } else {
-        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        final parsedValue = double.tryParse(textController1.text);
+        if (parsedValue == null) {
+          textController1.text = "Erro: Número inválido";
+          return;
+        }
+        valorGuardado1 = parsedValue;
+        valorGuardado1Label = parsedValue;
+        historico = "$valorGuardado1 -";
         textController1.clear();
       }
       calculo = "-";
@@ -80,12 +129,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void multiplicacaoCalc() {
+    if (textController1.text.isEmpty && calculo.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
     setState(() {
       if (calculo.isNotEmpty) {
         criarOperacao();
       } else {
-        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        final parsedValue = double.tryParse(textController1.text);
+        if (parsedValue == null) {
+          textController1.text = "Erro: Número inválido";
+          return;
+        }
+        valorGuardado1 = parsedValue;
+        valorGuardado1Label = parsedValue;
+        historico = "$valorGuardado1 x";
         textController1.clear();
       }
       calculo = "x";
@@ -93,12 +154,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void divisaoCalc() {
+    if (textController1.text.isEmpty && calculo.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
     setState(() {
       if (calculo.isNotEmpty) {
         criarOperacao();
       } else {
-        valorGuardado1 = double.tryParse(textController1.text) ?? 0;
-        valorGuardado1Label = double.tryParse(textController1.text) ?? 0;
+        final parsedValue = double.tryParse(textController1.text);
+        if (parsedValue == null) {
+          textController1.text = "Erro: Número inválido";
+          return;
+        }
+        valorGuardado1 = parsedValue;
+        valorGuardado1Label = parsedValue;
+        historico = "$valorGuardado1 ÷";
         textController1.clear();
       }
       calculo = "÷";
@@ -109,17 +182,18 @@ class _MyHomePageState extends State<MyHomePage> {
     criarOperacao();
     setState(() {
       calculo = "";
+      historico = "";
     });
   }
 
   void clearFields() {
     setState(() {
       textController1.clear();
-      result = "";
       valorGuardado1 = 0;
       valorGuardado1Label = null;
       calculo = "";
       valorGuardado2Label = null;
+      historico = "";
     });
   }
 
@@ -128,41 +202,32 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              [
-                if (valorGuardado1Label != null) valorGuardado1Label.toString(),
-                if (calculo.isNotEmpty) calculo,
-                if (valorGuardado2Label != null) valorGuardado2Label.toString(),
-              ].join(' '),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 18.0, left: 16.0, right: 16.0),
+            child: Text(
+              historico,
               style: const TextStyle(fontSize: 20),
             ),
-            InputWidget(controller: textController1, label: ""),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    iconButtonsRow(
-                      soma: somaCalc,
-                      subtracao: subtracaoCalc,
-                      multiplicacao: multiplicacaoCalc,
-                      divisao: divisaoCalc,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      result,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ]),
-            ),
-          ],
-        ),
+          ),
+          InputWidget(controller: textController1, label: ""),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  iconButtonsRow(
+                    soma: somaCalc,
+                    subtracao: subtracaoCalc,
+                    multiplicacao: multiplicacaoCalc,
+                    divisao: divisaoCalc,
+                  ),
+                ]),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
