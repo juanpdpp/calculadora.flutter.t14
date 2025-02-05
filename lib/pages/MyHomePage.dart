@@ -1,8 +1,7 @@
-import 'package:primeira_aplicacao_flutter/widgets/calcButton_widget.dart';
-import 'package:primeira_aplicacao_flutter/widgets/eraseButton_widget.dart';
-import 'package:primeira_aplicacao_flutter/widgets/input_widget.dart';
-import 'package:primeira_aplicacao_flutter/widgets/resulButton_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:primeira_aplicacao_flutter/widgets/history_widget.dart';
+import 'package:primeira_aplicacao_flutter/widgets/input_widget.dart';
+import 'package:primeira_aplicacao_flutter/widgets/numeric_buttons.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -15,6 +14,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var textController1 = TextEditingController();
+  List<String> history = [];
   double valorGuardado1 = 0;
   double valorGuardado2 = 0;
   double? valorGuardado1Label;
@@ -31,8 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
-    final parsedValue = double.tryParse(inputText);
-    if (parsedValue == null) {
+    final valorParsed = double.tryParse(inputText);
+    if (valorParsed == null) {
       setState(() {
         textController1.text = "Erro: Número inválido";
       });
@@ -40,8 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      valorGuardado2 = parsedValue;
-      valorGuardado2Label = parsedValue;
+      valorGuardado2 = valorParsed;
+      valorGuardado2Label = valorParsed;
 
       switch (calculo) {
         case "+":
@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
         case "-":
           valorGuardado1 -= valorGuardado2;
-          break;
+          break;  
         case "x":
           valorGuardado1 *= valorGuardado2;
           break;
@@ -71,10 +71,56 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       textController1.text = valorGuardado1.toString();
-      historico = "$valorGuardado1Label $calculo $valorGuardado2";
+
+      historico =
+          "$valorGuardado1Label $calculo $valorGuardado2 = $valorGuardado1";
+
+      history.add(
+          "$valorGuardado1Label $calculo $valorGuardado2 = $valorGuardado1");
 
       valorGuardado1Label = valorGuardado1;
       valorGuardado2Label = null;
+    });
+  }
+
+  void porcentagemCalc() {
+    final inputText = textController1.text;
+    if (inputText.isEmpty) {
+      setState(() {
+        textController1.text = "Erro: Insira um número";
+      });
+      return;
+    }
+
+    final parsedValue = double.tryParse(inputText);
+    if (parsedValue == null) {
+      setState(() {
+        textController1.text = "Erro: Número inválido";
+      });
+      return;
+    }
+
+    setState(() {
+      if (calculo.isNotEmpty && valorGuardado1Label != null) {
+        switch (calculo) {
+          case "+":
+          case "-":
+            valorGuardado2 = valorGuardado1 * (parsedValue / 100);
+            break;
+          case "x":
+          case "÷":
+            valorGuardado2 = parsedValue / 100;
+            break;
+          default:
+            valorGuardado2 = parsedValue / 100;
+            break;
+        }
+
+        textController1.text = valorGuardado2.toString();
+      } else {
+        valorGuardado2 = parsedValue / 100;
+        textController1.text = valorGuardado2.toString();
+      }
     });
   }
 
@@ -182,7 +228,6 @@ class _MyHomePageState extends State<MyHomePage> {
     criarOperacao();
     setState(() {
       calculo = "";
-      historico = "";
     });
   }
 
@@ -197,11 +242,46 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void addNumber(String numero) {
+    setState(() {
+      textController1.text += numero;
+    });
+  }
+
+  void exibirHistorico(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Calculation History'),
+          content: HistoryWidget(history: history),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.history),
+            onPressed: () {
+              exibirHistorico(context);
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -217,31 +297,30 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: EdgeInsets.all(16),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  iconButtonsRow(
-                    soma: somaCalc,
-                    subtracao: subtracaoCalc,
-                    multiplicacao: multiplicacaoCalc,
-                    divisao: divisaoCalc,
-                  ),
-                ]),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                NumericButtons(
+                  addNumber: addNumber,
+                  divisaoCalc: divisaoCalc,
+                  multiplicacaoCalc: multiplicacaoCalc,
+                  subtracaoCalc: subtracaoCalc,
+                  resultadoCalc: resultadoCalc,
+                  somaCalc: somaCalc,
+                  clearFields: clearFields,
+                  clearInput: () {setState(() {textController1.clear();});},
+                  backspace: () {
+                    setState(() {
+                      textController1.text = textController1.text.isNotEmpty ? textController1.text.substring
+                      (0, textController1.text.length - 1) : "";
+                    });
+                  },
+                  porcentagemCalc: porcentagemCalc,
+                )
+              ],
+            ),
           ),
         ],
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ClearFieldsButton(
-            onPressed: clearFields,
-          ),
-          SizedBox(height: 10),
-          ResultadoButton(
-            onPressed: resultadoCalc,
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
