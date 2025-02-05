@@ -14,13 +14,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var textController1 = TextEditingController();
-  List<String> history = [];
+  List<String> listaHistorico = [];
   double valorGuardado1 = 0;
   double valorGuardado2 = 0;
   double? valorGuardado1Label;
   double? valorGuardado2Label;
   String calculo = "";
-  String historico = "";
+  String ultimoCalc = "";
 
   void criarOperacao() {
     final inputText = textController1.text;
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
         case "÷":
           if (valorGuardado2 == 0) {
             textController1.text = "Erro: Divisão por zero";
-            historico = "";
+            ultimoCalc = "";
             valorGuardado1 = 0;
             valorGuardado1Label = null;
             calculo = "";
@@ -72,10 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
       textController1.text = valorGuardado1.toString();
 
-      historico =
+      ultimoCalc =
           "$valorGuardado1Label $calculo $valorGuardado2 = $valorGuardado1";
 
-      history.add(
+      listaHistorico.add(
           "$valorGuardado1Label $calculo $valorGuardado2 = $valorGuardado1");
 
       valorGuardado1Label = valorGuardado1;
@@ -142,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         valorGuardado1 = parsedValue;
         valorGuardado1Label = parsedValue;
-        historico = "$valorGuardado1 +";
+        ultimoCalc = "$valorGuardado1 +";
         textController1.clear();
       }
       calculo = "+";
@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         valorGuardado1 = parsedValue;
         valorGuardado1Label = parsedValue;
-        historico = "$valorGuardado1 -";
+        ultimoCalc = "$valorGuardado1 -";
         textController1.clear();
       }
       calculo = "-";
@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         valorGuardado1 = parsedValue;
         valorGuardado1Label = parsedValue;
-        historico = "$valorGuardado1 x";
+        ultimoCalc = "$valorGuardado1 x";
         textController1.clear();
       }
       calculo = "x";
@@ -217,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         valorGuardado1 = parsedValue;
         valorGuardado1Label = parsedValue;
-        historico = "$valorGuardado1 ÷";
+        ultimoCalc = "$valorGuardado1 ÷";
         textController1.clear();
       }
       calculo = "÷";
@@ -238,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
       valorGuardado1Label = null;
       calculo = "";
       valorGuardado2Label = null;
-      historico = "";
+      ultimoCalc = "";
     });
   }
 
@@ -254,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Calculation History'),
-          content: HistoryWidget(history: history),
+          content: HistoryWidget(history: listaHistorico),
           actions: <Widget>[
             TextButton(
               child: Text('Close'),
@@ -289,7 +289,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.only(top: 18.0, left: 16.0, right: 16.0),
             child: Text(
-              historico,
+              ultimoCalc,
               style: const TextStyle(fontSize: 20),
             ),
           ),
